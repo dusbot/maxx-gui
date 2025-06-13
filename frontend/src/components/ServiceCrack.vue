@@ -4,7 +4,20 @@
       <a-form :model="formState" layout="vertical">
         <a-row :gutter="24">
           <a-col :span="10">
-            <a-form-item :label="$t('common.targetAddress')">
+            <a-form-item>
+              <template #label>
+                <label-component>
+                  <span style="font-weight: bold">{{
+                    $t("common.targetAddress")
+                  }}</span>
+                  <span
+                    @click="openUploadTargetDialog"
+                    style="cursor: pointer; color: blue"
+                  >
+                    点击上传
+                  </span>
+                </label-component>
+              </template>
               <a-textarea
                 v-model="formState.target"
                 :placeholder="$t('placeholder.targetAddress')"
@@ -13,7 +26,20 @@
             </a-form-item>
           </a-col>
           <a-col :span="7">
-            <a-form-item :label="$t('common.username')">
+            <a-form-item>
+              <template #label>
+                <label-component>
+                  <span style="font-weight: bold">{{
+                    $t("common.username")
+                  }}</span>
+                  <span
+                    @click="openUploadUsernameDialog"
+                    style="cursor: pointer; color: blue"
+                  >
+                    点击上传
+                  </span>
+                </label-component>
+              </template>
               <a-textarea
                 v-model="formState.username"
                 :placeholder="$t('placeholder.username')"
@@ -22,7 +48,20 @@
             </a-form-item>
           </a-col>
           <a-col :span="7">
-            <a-form-item :label="$t('common.password')">
+            <a-form-item>
+              <template #label>
+                <label-component>
+                  <span style="font-weight: bold">{{
+                    $t("common.password")
+                  }}</span>
+                  <span
+                    @click="openUploadUsernameDialog"
+                    style="cursor: pointer; color: blue"
+                  >
+                    点击上传
+                  </span>
+                </label-component>
+              </template>
               <a-textarea
                 v-model="formState.password"
                 :placeholder="$t('placeholder.password')"
@@ -141,6 +180,77 @@
         </a-timeline>
       </div>
     </a-drawer>
+
+    <a-modal
+      :visible="uploadTargetModalVisible"
+      title="上传扫描目标"
+      @cancel="uploadTargetModalVisible = false"
+      @before-ok="handleTargetUploadOk"
+    >
+      <a-upload
+        draggable
+        :file-list="targetFileList"
+        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      >
+        :multiple="true" :limit="5" accept="text/plain" >
+        <a-button type="primary">选择文件</a-button>
+      </a-upload>
+      <div style="margin-top: 16px">
+        <p>已选择文件：</p>
+        <ul>
+          <li v-for="file in targetFileList" :key="file.uid">
+            {{ file.name }}
+          </li>
+        </ul>
+      </div>
+    </a-modal>
+
+    <a-modal
+      :visible="uploadUsernameModalVisible"
+      title="上传用户字典"
+      @cancel="uploadUsernameModalVisible = false"
+      @before-ok="handleUsernameUploadOk"
+    >
+      <a-upload
+        draggable
+        :file-list="usernameFileList"
+        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      >
+        :multiple="true" :limit="5" accept="text/plain" >
+        <a-button type="primary">选择文件</a-button>
+      </a-upload>
+      <div style="margin-top: 16px">
+        <p>已选择文件：</p>
+        <ul>
+          <li v-for="file in usernameFileList" :key="file.uid">
+            {{ file.name }}
+          </li>
+        </ul>
+      </div>
+    </a-modal>
+    <a-modal
+      :visible="uploadPasswordModalVisible"
+      title="上传密码字典"
+      @cancel="uploadPasswordModalVisible = false"
+      @before-ok="handlePasswordUploadOk"
+    >
+      <a-upload
+        draggable
+        :file-list="passwordFileList"
+        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      >
+        :multiple="true" :limit="5" accept="text/plain" >
+        <a-button type="primary">选择文件</a-button>
+      </a-upload>
+      <div style="margin-top: 16px">
+        <p>已选择文件：</p>
+        <ul>
+          <li v-for="file in passwordFileList" :key="file.uid">
+            {{ file.name }}
+          </li>
+        </ul>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -225,12 +335,10 @@ const addLog = (message: string) => {
 };
 
 const handleGenerateReport = () => {
-  // 生成报告的逻辑
   console.log("生成报告");
 };
 
 const handleDownloadCSV = () => {
-  // 下载CSV的逻辑
   console.log("下载CSV");
 };
 
@@ -264,6 +372,55 @@ const handlePause = () => {
     addLog(t("log.scanResumed"));
     Message.info(t("message.scanResumed"));
   }
+};
+
+const uploadTargetModalVisible = ref<boolean>(false);
+const uploadUsernameModalVisible = ref<boolean>(false);
+const uploadPasswordModalVisible = ref<boolean>(false);
+
+const targetFileList = ref<any[]>([]);
+const usernameFileList = ref<any[]>([]);
+const passwordFileList = ref<any[]>([]);
+
+const openUploadTargetDialog = () => {
+  uploadTargetModalVisible.value = true;
+};
+const openUploadUsernameDialog = () => {
+  uploadUsernameModalVisible.value = true;
+};
+const openUploadPasswordDialog = () => {
+  uploadPasswordModalVisible.value = true;
+};
+
+const handleTargetUploadOk = () => {
+  if (targetFileList.value.length === 0) {
+    Message.warning("请至少选择一个文件");
+    return false;
+  }
+  Message.success("扫描目标文件上传成功");
+  uploadTargetModalVisible.value = false;
+  targetFileList.value = [];
+  return true;
+};
+const handleUsernameUploadOk = () => {
+  if (usernameFileList.value.length === 0) {
+    Message.warning("请至少选择一个文件");
+    return false;
+  }
+  Message.success("用户文件上传成功");
+  uploadUsernameModalVisible.value = false;
+  usernameFileList.value = [];
+  return true;
+};
+const handlePasswordUploadOk = () => {
+  if (passwordFileList.value.length === 0) {
+    Message.warning("请至少选择一个文件");
+    return false;
+  }
+  Message.success("密码文件上传成功");
+  uploadPasswordModalVisible.value = false;
+  passwordFileList.value = [];
+  return true;
 };
 </script>
 
