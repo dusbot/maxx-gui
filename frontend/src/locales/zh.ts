@@ -14,8 +14,10 @@ export default {
     serviceType: '服务类型',
     target: '扫描目标',
     auth: '认证信息',
-    extra_info:'额外信息',
+    extra_info: '额外信息',
     service: '服务',
+    username: '用户名',
+    password: '密码',
     threads: '线程数',
     interval: '间隔时间(毫秒)',
     maxRuntime: '最长运行时间(秒)',
@@ -26,7 +28,9 @@ export default {
     continue: '继续',
     log: '日志',
     results: '',
-    executionLog: '执行日志'
+    executionLog: '执行日志',
+    generateReport: '生成报告',
+    downloadCSV: '下载CSV'
   },
   placeholder: {
     targetAddress: '例如: 192.168.1.1:22',

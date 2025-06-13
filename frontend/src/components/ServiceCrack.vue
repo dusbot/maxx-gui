@@ -5,32 +5,49 @@
         <a-row :gutter="24">
           <a-col :span="10">
             <a-form-item :label="$t('common.targetAddress')">
-              <a-textarea v-model="formState.target" :placeholder="$t('placeholder.targetAddress')"
-                :auto-size="{ minRows: 5, maxRows: 5 }" />
+              <a-textarea
+                v-model="formState.target"
+                :placeholder="$t('placeholder.targetAddress')"
+                :auto-size="{ minRows: 5, maxRows: 5 }"
+              />
             </a-form-item>
           </a-col>
           <a-col :span="7">
             <a-form-item :label="$t('common.username')">
-              <a-textarea v-model="formState.username" :placeholder="$t('placeholder.username')"
-                :auto-size="{ minRows: 5, maxRows: 5 }" />
+              <a-textarea
+                v-model="formState.username"
+                :placeholder="$t('placeholder.username')"
+                :auto-size="{ minRows: 5, maxRows: 5 }"
+              />
             </a-form-item>
           </a-col>
           <a-col :span="7">
             <a-form-item :label="$t('common.password')">
-              <a-textarea v-model="formState.password" :placeholder="$t('placeholder.password')"
-                :auto-size="{ minRows: 5, maxRows: 5 }" />
+              <a-textarea
+                v-model="formState.password"
+                :placeholder="$t('placeholder.password')"
+                :auto-size="{ minRows: 5, maxRows: 5 }"
+              />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="24">
           <a-col :span="4">
             <a-form-item :label="$t('common.threads')">
-              <a-input-number v-model="formState.threads" :min="1" :max="4096" />
+              <a-input-number
+                v-model="formState.threads"
+                :min="1"
+                :max="4096"
+              />
             </a-form-item>
           </a-col>
           <a-col :span="4">
             <a-form-item :label="$t('common.interval')">
-              <a-input-number v-model="formState.interval" :min="0" :max="10000" />
+              <a-input-number
+                v-model="formState.interval"
+                :min="0"
+                :max="10000"
+              />
             </a-form-item>
           </a-col>
           <a-col :span="4">
@@ -47,25 +64,61 @@
       </a-form>
     </a-card>
 
-    <div class="action-buttons">
-      <a-button type="primary" @click="handleScan" :loading="scanLoading">
-        {{ isScanning ? $t('common.cancel') : $t('common.scan') }}
-      </a-button>
+    <div
+      class="action-buttons"
+      style="display: flex; justify-content: space-between; width: 100%"
+    >
+      <div class="left-buttons" style="display: flex; gap: 8px">
+        <a-button
+          type="outline"
+          :status="isScanning ? 'danger' : 'normal'"
+          :disabled="isPaused"
+          @click="handleScan"
+          :loading="scanLoading"
+        >
+          {{ isScanning ? $t("common.cancel") : $t("common.scan") }}
+        </a-button>
+        <a-button
+          type="outline"
+          @click="handlePause"
+          :disabled="!(isScanning || isPaused)"
+          :status="isScanning ? 'warning' : 'success'"
+        >
+          {{ isPaused ? $t("common.continue") : $t("common.pause") }}
+        </a-button>
 
-      <a-button type="secondary" @click="handlePause" :disabled="!isScanning || isPaused">
-        {{ isPaused ? $t('common.continue') : $t('common.pause') }}
-      </a-button>
+        <a-button type="outline" @click="showLogDrawer = true">
+          <template #icon><icon-file /></template>
+          {{ $t("common.log") }}
+        </a-button>
+      </div>
 
-      <a-button @click="showLogDrawer = true">
-        <template #icon><icon-file /></template>
-        {{ $t('common.log') }}
-      </a-button>
+      <div class="right-buttons" style="display: flex; gap: 8px">
+        <a-button type="outline" @click="handleDownloadCSV">
+          <template #icon><icon-download /></template>
+          {{ $t("common.downloadCSV") }}
+        </a-button>
+        <a-button type="outline" @click="handleGenerateReport">
+          <template #icon><icon-file-pdf /></template>
+          {{ $t("common.generateReport") }}
+        </a-button>
+      </div>
     </div>
 
-    <a-progress :percent="progress" :status="progressStatus" class="progress-bar" :show-text="false" />
+    <a-progress
+      :percent="progress"
+      :status="progressStatus"
+      class="progress-bar"
+      :show-text="false"
+    />
 
     <a-card :title="$t('common.results')" class="results-card">
-      <a-table :columns="columns" :data="results" :pagination="false" :loading="tableLoading">
+      <a-table
+        :columns="columns"
+        :data="results"
+        :pagination="false"
+        :loading="tableLoading"
+      >
         <template #password="{ record }">
           <a-tooltip :content="record.password">
             <span class="password-cell">{{ record.password }}</span>
@@ -74,7 +127,12 @@
       </a-table>
     </a-card>
 
-    <a-drawer :title="$t('common.executionLog')" :visible="showLogDrawer" @cancel="showLogDrawer = false" :width="600">
+    <a-drawer
+      :title="$t('common.executionLog')"
+      :visible="showLogDrawer"
+      @cancel="showLogDrawer = false"
+      :width="600"
+    >
       <div class="log-content">
         <a-timeline>
           <a-timeline-item v-for="(log, index) in logs" :key="index">
@@ -87,9 +145,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
-import { Message } from '@arco-design/web-vue';
-import { useI18n } from 'vue-i18n';
+import { ref, reactive, computed } from "vue";
+import { Message } from "@arco-design/web-vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
@@ -100,7 +158,7 @@ interface ScanParam {
   threads: number;
   interval: number;
   maxRuntime: number;
-  proxies: string
+  proxies: string;
 }
 
 interface ResultItem {
@@ -116,13 +174,13 @@ interface LogItem {
 }
 
 const formState = reactive<ScanParam>({
-  target: '',
-  username: '',
-  password: '',
+  target: "",
+  username: "",
+  password: "",
   threads: 1024,
   interval: 100,
   maxRuntime: 0,
-  proxies: ''
+  proxies: "",
 });
 
 const isScanning = ref(false);
@@ -131,27 +189,29 @@ const scanLoading = ref(false);
 const tableLoading = ref(false);
 
 const progress = ref(0);
-const progressStatus = ref<'normal' | 'success' | 'warning' | 'danger'>('normal');
+const progressStatus = ref<"normal" | "success" | "warning" | "danger">(
+  "normal"
+);
 
 const results = ref<ResultItem[]>([
   {
-    target: 'godzilla://10.1.1.1/sdf/asdf/as/asdf/sadf/sadf/x.php',
-    service: 'GODZILLA',
-    auth: 'root:123456',
-    extrainfo: 'No Auth'
+    target: "godzilla://10.1.1.1/sdf/asdf/as/asdf/sadf/sadf/x.php",
+    service: "GODZILLA",
+    auth: "root:123456",
+    extrainfo: "No Auth",
   },
   {
-    target: 'ssh://10.1.1.1:22',
-    service: 'ssh',
-    auth: 'root:123456',
-    extrainfo: 'No Auth'
-  }
+    target: "ssh://10.1.1.1:22",
+    service: "ssh",
+    auth: "root:123456",
+    extrainfo: "No Auth",
+  },
 ]);
 const columns = computed(() => [
-  { title: t('common.target'), dataIndex: 'target', width: '40%' },
-  { title: t('common.service'), dataIndex: 'service', width: '10%' },
-  { title: t('common.auth'), dataIndex: 'auth', width: '20%' },
-  { title: t('common.extra_info'), dataIndex: 'extrainfo', width: '30%' },
+  { title: t("common.target"), dataIndex: "target", width: "40%" },
+  { title: t("common.service"), dataIndex: "service", width: "10%" },
+  { title: t("common.auth"), dataIndex: "auth", width: "20%" },
+  { title: t("common.extra_info"), dataIndex: "extrainfo", width: "30%" },
 ]);
 
 const logs = ref<LogItem[]>([]);
@@ -160,8 +220,18 @@ const showLogDrawer = ref(false);
 const addLog = (message: string) => {
   logs.value.push({
     time: new Date().toLocaleTimeString(),
-    message
+    message,
   });
+};
+
+const handleGenerateReport = () => {
+  // 生成报告的逻辑
+  console.log("生成报告");
+};
+
+const handleDownloadCSV = () => {
+  // 下载CSV的逻辑
+  console.log("下载CSV");
 };
 
 let scanInterval: number;
@@ -169,79 +239,30 @@ let scanTimer: number;
 
 const handleScan = () => {
   if (isScanning.value) {
-    clearInterval(scanInterval);
-    clearTimeout(scanTimer);
     isScanning.value = false;
-    progressStatus.value = 'danger';
-    addLog(t('log.scanCancelled'));
-    Message.warning(t('message.scanCancelled'));
   } else {
-    if (!formState.target) {
-      Message.error(t('message.enterTargetAddress'));
-      return;
-    }
-
-    scanLoading.value = true;
-    tableLoading.value = true;
-    addLog(t('log.startingScan'));
-
-    setTimeout(() => {
-      isScanning.value = true;
-      scanLoading.value = false;
-      progressStatus.value = 'normal';
-      addLog(t('log.scanStarted', { target: formState.target }));
-
-      let currentProgress = 0;
-      scanInterval = setInterval(() => {
-        if (!isPaused.value) {
-          currentProgress += Math.random() * 5;
-          progress.value = Math.min(currentProgress, 100);
-
-          if (Math.random() > 0.9) {
-            const newResult: ResultItem = {
-              target: formState.target,
-              service: t('common.service'),
-              auth: t('common.auth'),
-              extrainfo: t('common.extra_info'),
-            };
-            results.value.push(newResult);
-            addLog(t('log.foundCredentials', { username: newResult.auth }));
-          }
-
-          if (currentProgress >= 100) {
-            clearInterval(scanInterval);
-            isScanning.value = false;
-            progressStatus.value = 'success';
-            addLog(t('log.scanCompleted'));
-            Message.success(t('message.scanCompleted'));
-          }
-        }
-      }, 500);
-
-      scanTimer = setTimeout(() => {
-        if (isScanning.value) {
-          clearInterval(scanInterval);
-          isScanning.value = false;
-          progress.value = 100;
-          progressStatus.value = 'warning';
-          addLog(t('log.scanStopped'));
-          Message.warning(t('message.scanStopped'));
-        }
-      }, formState.maxRuntime * 60 * 1000);
-
-      tableLoading.value = false;
-    }, 1000);
+    isScanning.value = true;
   }
 };
 
 const handlePause = () => {
-  isPaused.value = !isPaused.value;
-  if (isPaused.value) {
-    addLog(t('log.scanPaused'));
-    Message.info(t('message.scanPaused'));
+  if (isScanning.value) {
+    if (!isPaused.value) {
+      isPaused.value = true;
+      isScanning.value = false;
+    }
   } else {
-    addLog(t('log.scanResumed'));
-    Message.info(t('message.scanResumed'));
+    if (isPaused.value) {
+      isPaused.value = false;
+      isScanning.value = true;
+    }
+  }
+  if (isPaused.value) {
+    addLog(t("log.scanPaused"));
+    Message.info(t("message.scanPaused"));
+  } else {
+    addLog(t("log.scanResumed"));
+    Message.info(t("message.scanResumed"));
   }
 };
 </script>
