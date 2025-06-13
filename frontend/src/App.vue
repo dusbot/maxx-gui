@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :theme="themeConfig">
+  <a-config-provider :theme="themeConfig" :locale="arcoLocale">
     <a-layout style="height: 100vh">
       <a-layout-sider :style="{
         height: '100vh',
@@ -9,8 +9,8 @@
         top: 0,
         bottom: 0,
         zIndex: 100,
-      }" :collapsed="collapsed" :width="190" breakpoint="lg" @collapse="onCollapse">
-        <div class="logo-container">
+      }" :collapsed="collapsed" :collapsible="!darkTheme" :width="190" breakpoint="lg" @collapse="onCollapse">
+        <div class="logo-container" :class="{ 'collapsed-logo': collapsed }">
           <img src="@/assets/images/maxx_logo.svg" alt="logo" class="logo" />
         </div>
         <a-menu v-model:selected-keys="selectedKeys" :collapsed="collapsed" :style="{ borderRight: 'none' }"
@@ -19,25 +19,25 @@
             <template #icon>
               <icon-lock />
             </template>
-            Service Crack
+            {{ $t('common.serviceCrack') }}
           </a-menu-item>
           <a-menu-item key="port">
             <template #icon>
               <icon-scan />
             </template>
-            Port Scan
+            {{ $t('common.portScan') }}
           </a-menu-item>
           <a-menu-item key="vuln">
             <template #icon>
               <icon-bug />
             </template>
-            Vulnerability Scan
+            {{ $t('common.vulnerabilityScan') }}
           </a-menu-item>
         </a-menu>
 
         <div class="sidebar-footer">
-          <a-tooltip :content="collapsed ? 'Expand' : 'Collapse'" position="right">
-            <a-button shape="circle" class="collapse-btn" @click="toggleCollapse">
+          <a-tooltip :content="collapsed ? $t('common.expand') : $t('common.collapse')" position="right">
+            <a-button shape="circle" class="collapse-btn" @click="toggleCollapse" :disabled="darkTheme">
               <template #icon>
                 <icon-left v-if="!collapsed" />
                 <icon-right v-else />
@@ -45,7 +45,7 @@
             </a-button>
           </a-tooltip>
 
-          <a-tooltip :content="darkTheme ? 'Light Mode' : 'Dark Mode'" position="right">
+          <a-tooltip :content="darkTheme ? $t('common.lightMode') : $t('common.darkMode')" position="right">
             <a-button shape="circle" class="theme-toggle-btn" @click="toggleTheme">
               <template #icon>
                 <icon-moon-fill v-if="darkTheme" />
@@ -63,11 +63,14 @@
         <a-layout-header class="header">
           <div class="header-left">
             <a-breadcrumb>
-              <a-breadcrumb-item>Security Tools</a-breadcrumb-item>
+              <a-breadcrumb-item>{{ $t('common.securityTools') }}</a-breadcrumb-item>
               <a-breadcrumb-item>{{ currentTitle }}</a-breadcrumb-item>
             </a-breadcrumb>
           </div>
           <div class="header-right">
+            <a-button type="text" @click="toggleLocale" :style="{ marginRight: '10px' }">
+              {{ currentLocale === 'zh' ? '中文' : 'EN' }}
+            </a-button>
             <a-avatar :size="32" :style="{ backgroundColor: '#3370ff' }">
               <icon-user />
             </a-avatar>
@@ -83,7 +86,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Component } from 'vue';
 import PortScanner from './components/PortScanner.vue';
 import VulnScanner from './components/VulnScanner.vue';
@@ -98,6 +102,30 @@ import {
   IconSunFill,
   IconUser
 } from '@arco-design/web-vue/es/icon';
+import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
+import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
+
+const { t, locale } = useI18n();
+
+const currentLocale = ref(locale.value);
+
+const arcoLocale = computed(() => {
+  return currentLocale.value === 'zh' ? zhCN : enUS;
+});
+
+const toggleLocale = () => {
+  currentLocale.value = currentLocale.value === 'zh' ? 'en' : 'zh';
+  locale.value = currentLocale.value;
+  localStorage.setItem('locale', currentLocale.value);
+};
+
+onMounted(() => {
+  const savedLocale = localStorage.getItem('locale');
+  if (savedLocale) {
+    currentLocale.value = savedLocale;
+    locale.value = savedLocale;
+  }
+});
 
 const selectedKeys = ref(['crack']);
 const collapsed = ref(false);
@@ -109,14 +137,14 @@ const componentMap: Record<string, Component> = {
   vuln: VulnScanner,
 };
 
-const titleMap: Record<string, string> = {
-  crack: 'Service Crack',
-  port: 'Port Scan',
-  vuln: 'Vulnerability Scan',
-};
+const titleMap = computed<Record<string, string>>(() => ({
+  crack: t('common.serviceCrack'),
+  port: t('common.portScan'),
+  vuln: t('common.vulnerabilityScan')
+}));
 
-const currentComponent = computed(() => componentMap[selectedKeys.value[0]]);
-const currentTitle = computed(() => titleMap[selectedKeys.value[0]]);
+const currentComponent = computed(() => componentMap[selectedKeys.value[0]])
+const currentTitle = computed(() => computed(() => titleMap.value[selectedKeys.value[0]]))
 
 const themeConfig = reactive({
   components: {
@@ -136,7 +164,9 @@ function onMenuClick(key: string) {
 }
 
 function toggleCollapse() {
-  collapsed.value = !collapsed.value;
+  if (!darkTheme.value) {
+    collapsed.value = !collapsed.value;
+  }
 }
 
 function onCollapse(val: boolean) {
@@ -147,13 +177,13 @@ function toggleTheme() {
   darkTheme.value = !darkTheme.value;
 
   if (darkTheme.value) {
+    collapsed.value = true;
+  }
+
+  if (darkTheme.value) {
     document.body.setAttribute('arco-theme', 'dark');
-    themeConfig.components.Menu.itemSelectedBg = 'var(--color-primary-light-1)';
-    themeConfig.components.Menu.itemHoverBg = 'var(--color-primary-light-2)';
   } else {
     document.body.removeAttribute('arco-theme');
-    themeConfig.components.Menu.itemSelectedBg = 'var(--color-primary-light-1)';
-    themeConfig.components.Menu.itemHoverBg = 'var(--color-primary-light-2)';
   }
 }
 </script>
@@ -166,16 +196,22 @@ function toggleTheme() {
   height: 64px;
   padding: 12px;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .logo {
   height: 32px;
-  transition: all 0.2s;
+  width: auto;
+  transition: all 0.2s ease;
 }
 
-.logo-collapsed {
+.logo-container.collapsed-logo {
+  padding: 12px 6px;
+}
+
+.logo-container.collapsed-logo .logo {
   height: 28px;
-  transition: all 0.2s;
+  transform: scale(0.85);
 }
 
 .sidebar-footer {
