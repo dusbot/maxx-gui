@@ -55,7 +55,7 @@
                     $t("common.password")
                   }}</span>
                   <span
-                    @click="openUploadUsernameDialog"
+                    @click="openUploadPasswordDialog"
                     style="cursor: pointer; color: blue"
                   >
                     点击上传
