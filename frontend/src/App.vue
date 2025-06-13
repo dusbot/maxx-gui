@@ -33,6 +33,12 @@
             </template>
             {{ $t('common.vulnerabilityScan') }}
           </a-menu-item>
+          <a-menu-item key="config">
+            <template #icon>
+              <icon-edit />
+            </template>
+            {{ $t('common.config') }}
+          </a-menu-item>
         </a-menu>
 
         <div class="sidebar-footer">
@@ -96,6 +102,7 @@ import {
   IconScan,
   IconBug,
   IconLock,
+  IconEdit,
   IconLeft,
   IconRight,
   IconMoonFill,
@@ -104,6 +111,7 @@ import {
 } from '@arco-design/web-vue/es/icon';
 import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
 import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
+import Config from './components/Config.vue';
 
 const { t, locale } = useI18n();
 
@@ -135,12 +143,14 @@ const componentMap: Record<string, Component> = {
   crack: ServiceCrack,
   port: PortScanner,
   vuln: VulnScanner,
+  config: Config,
 };
 
 const titleMap = computed<Record<string, string>>(() => ({
   crack: t('common.serviceCrack'),
   port: t('common.portScan'),
-  vuln: t('common.vulnerabilityScan')
+  vuln: t('common.vulnerabilityScan'),
+  config: t('common.config')
 }));
 
 const currentComponent = computed(() => componentMap[selectedKeys.value[0]])
@@ -211,7 +221,7 @@ function toggleTheme() {
 
 .logo-container.collapsed-logo .logo {
   height: 28px;
-  transform: scale(0.85);
+  transform: scale(0.5);
 }
 
 .sidebar-footer {

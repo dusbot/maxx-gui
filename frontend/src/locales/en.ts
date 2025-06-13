@@ -1,6 +1,7 @@
 export default {
   common: {
     securityTools: 'Security Tools',
+    config: 'Config',
     serviceCrack: 'Service Crack',
     portScan: 'Port Scan',
     vulnerabilityScan: 'Vulnerability Scan',
@@ -8,27 +9,37 @@ export default {
     collapse: 'Collapse',
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
-    scanConfiguration: 'Scan Configuration',
+    scanConfiguration: '',
     targetAddress: 'Target Address',
     serviceType: 'Service Type',
     target: 'Target',
-    username: 'Username',
-    password: 'Password',
+    auth: 'auth',
+    extra_info: 'Extra info',
     service: 'service',
     threads: 'Threads',
     interval: 'Interval (ms)',
-    maxRuntime: 'Max Runtime (min)',
+    maxRuntime: 'Max Runtime (s)',
+    proxies: 'Proxies',
     scan: 'Scan',
     cancel: 'Cancel',
     pause: 'Pause',
     continue: 'Continue',
     log: 'Log',
-    results: 'Results',
+    results: '',
     executionLog: 'Execution Log',
   },
   placeholder: {
     targetAddress: 'e.g. 192.168.1.1:22',
     username: 'Leave empty for brute force',
     password: 'Leave empty for dictionary'
+  },
+  message: {
+    scanCompleted: 'Scan Completed',
+    scanStopped: 'Scan Stopped',
+    scanPaused: 'Scan Paused',
+    scanResumed: 'Scan Resumed',
+    scanCancelled: 'Scan Cancelled',
+
+    enterTargetAddress: 'Please enter the target address',
   }
 };

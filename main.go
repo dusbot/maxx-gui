@@ -15,8 +15,8 @@ func main() {
 	app := NewApp()
 	err := wails.Run(&options.App{
 		Title:       "maxx-gui",
-		Width:       1024,
-		Height:      768,
+		MinWidth:    1285,
+		MinHeight:   850,
 		StartHidden: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
