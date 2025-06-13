@@ -200,12 +200,12 @@ const handleScan = () => {
           if (Math.random() > 0.9) {
             const newResult: ResultItem = {
               target: formState.target,
-              username: formState.username || `user${Math.floor(Math.random() * 100)}`,
-              password: formState.password || `pass${Math.floor(Math.random() * 1000)}`,
-              service: t('common.service')
+              service: t('common.service'),
+              auth: t('common.auth'),
+              extrainfo: t('common.extra_info'),
             };
             results.value.push(newResult);
-            addLog(t('log.foundCredentials', { username: newResult.username }));
+            addLog(t('log.foundCredentials', { username: newResult.auth }));
           }
 
           if (currentProgress >= 100) {
