@@ -2,6 +2,12 @@ export default {
   common: {
     securityTools: '安全工具',
     config: '设置',
+    click2Upload:'点击上传',
+    uploadTarget:'上传扫描目标',
+    uploadUsername:'上传用户字典',
+    uploadPassword:'上传密码字典',
+    selectFile:'选择文件',
+    selectedFile:'已选择文件：',
     serviceCrack: '服务爆破',
     portScan: '端口扫描',
     vulnerabilityScan: '漏洞扫描',

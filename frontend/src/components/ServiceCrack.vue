@@ -1,7 +1,7 @@
 <template>
   <div class="service-crack-container">
     <a-card :title="$t('common.scanConfiguration')" class="config-card">
-      <a-form :model="formState" layout="vertical">
+      <a-form :model="scanParam" layout="vertical">
         <a-row :gutter="24">
           <a-col :span="10">
             <a-form-item>
@@ -14,12 +14,12 @@
                     @click="openUploadTargetDialog"
                     style="cursor: pointer; color: blue"
                   >
-                    点击上传
+                    {{ t("common.click2Upload") }}
                   </span>
                 </label-component>
               </template>
               <a-textarea
-                v-model="formState.target"
+                v-model="scanParam.target"
                 :placeholder="$t('placeholder.targetAddress')"
                 :auto-size="{ minRows: 5, maxRows: 5 }"
               />
@@ -36,12 +36,12 @@
                     @click="openUploadUsernameDialog"
                     style="cursor: pointer; color: blue"
                   >
-                    点击上传
+                    {{ t("common.click2Upload") }}
                   </span>
                 </label-component>
               </template>
               <a-textarea
-                v-model="formState.username"
+                v-model="scanParam.username"
                 :placeholder="$t('placeholder.username')"
                 :auto-size="{ minRows: 5, maxRows: 5 }"
               />
@@ -58,12 +58,12 @@
                     @click="openUploadPasswordDialog"
                     style="cursor: pointer; color: blue"
                   >
-                    点击上传
+                    {{ t("common.click2Upload") }}
                   </span>
                 </label-component>
               </template>
               <a-textarea
-                v-model="formState.password"
+                v-model="scanParam.password"
                 :placeholder="$t('placeholder.password')"
                 :auto-size="{ minRows: 5, maxRows: 5 }"
               />
@@ -74,7 +74,7 @@
           <a-col :span="4">
             <a-form-item :label="$t('common.threads')">
               <a-input-number
-                v-model="formState.threads"
+                v-model="scanParam.threads"
                 :min="1"
                 :max="4096"
               />
@@ -83,7 +83,7 @@
           <a-col :span="4">
             <a-form-item :label="$t('common.interval')">
               <a-input-number
-                v-model="formState.interval"
+                v-model="scanParam.interval"
                 :min="0"
                 :max="10000"
               />
@@ -91,12 +91,12 @@
           </a-col>
           <a-col :span="4">
             <a-form-item :label="$t('common.maxRuntime')">
-              <a-input-number v-model="formState.maxRuntime" :min="0" />
+              <a-input-number v-model="scanParam.maxRuntime" :min="0" />
             </a-form-item>
           </a-col>
           <a-col :span="4">
             <a-form-item :label="$t('common.proxies')">
-              <a-select v-model="formState.proxies" />
+              <a-select v-model="scanParam.proxies" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -183,20 +183,21 @@
 
     <a-modal
       :visible="uploadTargetModalVisible"
-      title="上传扫描目标"
+      :title="t('common.uploadTarget')"
       @cancel="uploadTargetModalVisible = false"
       @before-ok="handleTargetUploadOk"
     >
       <a-upload
         draggable
         :file-list="targetFileList"
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+        :action="''"
+        :auto-upload="false"
       >
         :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">选择文件</a-button>
+        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
       </a-upload>
       <div style="margin-top: 16px">
-        <p>已选择文件：</p>
+        <p>{{ t("common.selectedFile") }}</p>
         <ul>
           <li v-for="file in targetFileList" :key="file.uid">
             {{ file.name }}
@@ -207,7 +208,7 @@
 
     <a-modal
       :visible="uploadUsernameModalVisible"
-      title="上传用户字典"
+      :title="t('common.uploadUsername')"
       @cancel="uploadUsernameModalVisible = false"
       @before-ok="handleUsernameUploadOk"
     >
@@ -217,10 +218,10 @@
         action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
       >
         :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">选择文件</a-button>
+        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
       </a-upload>
       <div style="margin-top: 16px">
-        <p>已选择文件：</p>
+        <p>{{ t("common.selectedFile") }}</p>
         <ul>
           <li v-for="file in usernameFileList" :key="file.uid">
             {{ file.name }}
@@ -230,7 +231,7 @@
     </a-modal>
     <a-modal
       :visible="uploadPasswordModalVisible"
-      title="上传密码字典"
+      :title="t('common.uploadPassword')"
       @cancel="uploadPasswordModalVisible = false"
       @before-ok="handlePasswordUploadOk"
     >
@@ -240,10 +241,10 @@
         action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
       >
         :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">选择文件</a-button>
+        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
       </a-upload>
       <div style="margin-top: 16px">
-        <p>已选择文件：</p>
+        <p>{{ t("common.selectedFile") }}</p>
         <ul>
           <li v-for="file in passwordFileList" :key="file.uid">
             {{ file.name }}
@@ -283,7 +284,7 @@ interface LogItem {
   message: string;
 }
 
-const formState = reactive<ScanParam>({
+const scanParam = reactive<ScanParam>({
   target: "",
   username: "",
   password: "",
@@ -341,9 +342,6 @@ const handleGenerateReport = () => {
 const handleDownloadCSV = () => {
   console.log("下载CSV");
 };
-
-let scanInterval: number;
-let scanTimer: number;
 
 const handleScan = () => {
   if (isScanning.value) {

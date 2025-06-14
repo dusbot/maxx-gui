@@ -2,6 +2,12 @@ export default {
   common: {
     securityTools: 'Security Tools',
     config: 'Config',
+    click2Upload:'Click to upload',
+    uploadTarget:'Upload target',
+    uploadUsername:'Upload user dic',
+    uploadPassword:'Upload pass dic',
+    selectFile:'Select file',
+    selectedFile:'Selected file:',
     serviceCrack: 'Service Crack',
     portScan: 'Port Scan',
     vulnerabilityScan: 'Vulnerability Scan',
