@@ -7,7 +7,7 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold; margin-right: 10px;">{{
+                  <span style="font-weight: bold; margin-right: 10px">{{
                     $t("common.targetAddress")
                   }}</span>
                   <span
@@ -30,7 +30,7 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold; margin-right: 10px;">{{
+                  <span style="font-weight: bold; margin-right: 10px">{{
                     $t("common.username")
                   }}</span>
                   <span
@@ -52,7 +52,7 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold; margin-right: 10px;">{{
+                  <span style="font-weight: bold; margin-right: 10px">{{
                     $t("common.password")
                   }}</span>
                   <span
@@ -260,6 +260,10 @@
 import { ref, reactive, computed } from "vue";
 import { Message } from "@arco-design/web-vue";
 import { useI18n } from "vue-i18n";
+import { addUniqueItem, genHash } from "@/utils/utils";
+import { Scan } from "../../wailsjs/go/handler/CrackHandler";
+import { model, consts } from "../../wailsjs/go/models";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
 const { t } = useI18n();
 
@@ -295,8 +299,7 @@ const scanParam = reactive<ScanParam>({
   proxies: "",
 });
 
-const isTargetInvalid = ref(false)
-
+const isTargetInvalid = ref(false);
 const isScanning = ref(false);
 const isPaused = ref(false);
 const scanLoading = ref(false);
@@ -307,20 +310,32 @@ const progressStatus = ref<"normal" | "success" | "warning" | "danger">(
   "normal"
 );
 
-const results = ref<ResultItem[]>([
-  {
-    target: "godzilla://10.1.1.1/sdf/asdf/as/asdf/sadf/sadf/x.php",
-    service: "GODZILLA",
-    auth: "root:123456",
-    extrainfo: "No Auth",
-  },
-  {
-    target: "ssh://10.1.1.1:22",
-    service: "ssh",
-    auth: "root:123456",
-    extrainfo: "No Auth",
-  },
-]);
+const results = ref<ResultItem[]>([]);
+
+EventsOn(consts.EVENT.EVENT_RESULT, (data: any) => {
+  const result = data as model.CrackResult;
+  let auth = result.Username + ":" + result.Password;
+  let extrainfo = "";
+  if (auth === ":") {
+    auth = "";
+    extrainfo = "No Auth";
+  }
+  const newItem = {
+    target: result.Target,
+    service: result.Service,
+    auth: auth,
+    extrainfo: extrainfo,
+  };
+  addUniqueItem(results.value, newItem, [
+    "target",
+    "service",
+    "auth",
+    "extrainfo",
+  ]);
+});
+
+// EventsOn(consts.EVENT.EVENT_PROGRESS, (progress: any) => {});
+
 const columns = computed(() => [
   { title: t("common.target"), dataIndex: "target", width: "40%" },
   { title: t("common.service"), dataIndex: "service", width: "10%" },
@@ -338,11 +353,9 @@ const addLog = (message: string) => {
   });
 };
 
-const handleGenerateReport = () => {
-};
+const handleGenerateReport = () => {};
 
-const handleDownloadCSV = () => {
-};
+const handleDownloadCSV = () => {};
 
 const handleScan = () => {
   if (isScanning.value) {
@@ -350,12 +363,19 @@ const handleScan = () => {
   } else {
     if (scanParam.target === "") {
       Message.warning(t("message.targetAddressRequirement"));
-      isTargetInvalid.value = true
+      isTargetInvalid.value = true;
       return;
     }
-    isTargetInvalid.value = false
-    //todo: call the backend scan
-    isScanning.value = true;
+    isTargetInvalid.value = false;
+    const task = new model.CrackTask();
+    task.Targets = scanParam.target;
+    task.Usernames = scanParam.username;
+    task.Passwords = scanParam.password;
+    task.MaxRuntime = scanParam.maxRuntime;
+    task.Thread = scanParam.threads;
+    task.Proxies = scanParam.proxies;
+    task.Interval = scanParam.interval;
+    Scan(task).then((ok) => (isScanning.value = ok));
   }
 };
 

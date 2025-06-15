@@ -4,6 +4,7 @@ import (
 	"context"
 	"maxxgui/backend/consts"
 	"maxxgui/backend/handler"
+	"maxxgui/backend/model"
 
 	"github.com/google/wire"
 )
@@ -27,14 +28,15 @@ func (a *App) OnStartup(ctx context.Context) {
 func (a *App) Bind() (binders []any) {
 	binders = append(binders,
 		a.CrackHandler,
+
+		model.DefaultCrackProvider,
 	)
 	return
 }
 
 func (a *App) Enums() (enums []any) {
 	enums = append(enums,
-		consts.EVENT_PROGRESS,
-		consts.EVENT_RESULT,
+		consts.EventEnums,
 	)
 	return
 }

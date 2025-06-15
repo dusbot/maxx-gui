@@ -9,7 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': rootPath + 'src',
-      'wailsjs': rootPath + 'wailsjs',
+      '@wailsApp': rootPath + 'wailsjs',
     },
   },
 })

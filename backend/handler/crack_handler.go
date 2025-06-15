@@ -25,8 +25,8 @@ type CrackHandler struct {
 	Query *query.Query
 }
 
-func (c *CrackHandler) Scan(task *model.CrackTask) (ok bool) {
-	if task == nil {
+func (c *CrackHandler) Scan(task model.CrackTask) (ok bool) {
+	if task.Targets == "" {
 		return
 	}
 	uuid, err := utils.GenerateTimestampUUID(8)

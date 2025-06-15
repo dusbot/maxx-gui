@@ -2,6 +2,7 @@ package init_
 
 import (
 	"maxxgui/backend/consts"
+	"maxxgui/backend/model"
 	"maxxgui/backend/query"
 	"maxxgui/backend/utils"
 	"path"
@@ -26,7 +27,7 @@ func (d *DB) connect(dsn string) (err error) {
 
 func (d *DB) autoMigrate() (err error) {
 	entities := []any{
-		entity.CrackResult{},
+		model.CrackResult{},
 	}
 	return d.db.AutoMigrate(entities...)
 }

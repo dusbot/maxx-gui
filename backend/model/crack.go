@@ -26,3 +26,15 @@ type CrackResult struct {
 	Username string `gorm:"null"`
 	Password string `gorm:"null"`
 }
+
+type CrackProvider struct {
+	CrackTask   CrackTask
+	CrackResult CrackResult
+}
+
+func (p *CrackProvider) Register(task CrackTask, result CrackResult) {
+	p.CrackTask = task
+	p.CrackResult = result
+}
+
+var DefaultCrackProvider = &CrackProvider{}
