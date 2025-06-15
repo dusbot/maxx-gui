@@ -39,9 +39,9 @@ export default {
     downloadCSV: '下载CSV'
   },
   placeholder: {
-    targetAddress: '例如: 192.168.1.1:22',
-    username: '留空使用暴力破解',
-    password: '留空使用字典'
+    targetAddress: '例如: 192.168.1.1:22,ftp://192.168.1.1,192.168.1.1/24:[80,8000-9000]',
+    username: '例如：root,test,admin',
+    password: '例如：pass,123,admin'
   },
   message: {
     scanCompleted: '扫描完成',
@@ -51,5 +51,9 @@ export default {
     scanCancelled: '扫描已取消',
 
     enterTargetAddress: '请输入目标地址',
+
+    oneFileSelectedRequirement: '请至少选择一个文件',
+    uploadSuccess: '上传成功',
+    targetAddressRequirement: '请输入目标地址',
   }
 };

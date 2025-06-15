@@ -7,12 +7,12 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold">{{
+                  <span style="font-weight: bold; margin-right: 10px;">{{
                     $t("common.targetAddress")
                   }}</span>
                   <span
                     @click="openUploadTargetDialog"
-                    style="cursor: pointer; color: blue"
+                    style="cursor: pointer; color: #1890ff"
                   >
                     {{ t("common.click2Upload") }}
                   </span>
@@ -22,6 +22,7 @@
                 v-model="scanParam.target"
                 :placeholder="$t('placeholder.targetAddress')"
                 :auto-size="{ minRows: 5, maxRows: 5 }"
+                :error="isTargetInvalid"
               />
             </a-form-item>
           </a-col>
@@ -29,12 +30,12 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold">{{
+                  <span style="font-weight: bold; margin-right: 10px;">{{
                     $t("common.username")
                   }}</span>
                   <span
                     @click="openUploadUsernameDialog"
-                    style="cursor: pointer; color: blue"
+                    style="cursor: pointer; color: #1890ff"
                   >
                     {{ t("common.click2Upload") }}
                   </span>
@@ -51,12 +52,12 @@
             <a-form-item>
               <template #label>
                 <label-component>
-                  <span style="font-weight: bold">{{
+                  <span style="font-weight: bold; margin-right: 10px;">{{
                     $t("common.password")
                   }}</span>
                   <span
                     @click="openUploadPasswordDialog"
-                    style="cursor: pointer; color: blue"
+                    style="cursor: pointer; color: #1890ff"
                   >
                     {{ t("common.click2Upload") }}
                   </span>
@@ -85,7 +86,7 @@
               <a-input-number
                 v-model="scanParam.interval"
                 :min="0"
-                :max="10000"
+                :max="3600000"
               />
             </a-form-item>
           </a-col>
@@ -294,6 +295,8 @@ const scanParam = reactive<ScanParam>({
   proxies: "",
 });
 
+const isTargetInvalid = ref(false)
+
 const isScanning = ref(false);
 const isPaused = ref(false);
 const scanLoading = ref(false);
@@ -336,17 +339,22 @@ const addLog = (message: string) => {
 };
 
 const handleGenerateReport = () => {
-  console.log("生成报告");
 };
 
 const handleDownloadCSV = () => {
-  console.log("下载CSV");
 };
 
 const handleScan = () => {
   if (isScanning.value) {
     isScanning.value = false;
   } else {
+    if (scanParam.target === "") {
+      Message.warning(t("message.targetAddressRequirement"));
+      isTargetInvalid.value = true
+      return;
+    }
+    isTargetInvalid.value = false
+    //todo: call the backend scan
     isScanning.value = true;
   }
 };
@@ -392,30 +400,30 @@ const openUploadPasswordDialog = () => {
 
 const handleTargetUploadOk = () => {
   if (targetFileList.value.length === 0) {
-    Message.warning("请至少选择一个文件");
+    Message.warning(t("message.oneFileSelectedRequirement"));
     return false;
   }
-  Message.success("扫描目标文件上传成功");
+  Message.success(t("message.uploadSuccess"));
   uploadTargetModalVisible.value = false;
   targetFileList.value = [];
   return true;
 };
 const handleUsernameUploadOk = () => {
   if (usernameFileList.value.length === 0) {
-    Message.warning("请至少选择一个文件");
+    Message.warning(t("message.oneFileSelectedRequirement"));
     return false;
   }
-  Message.success("用户文件上传成功");
+  Message.success(t("message.uploadSuccess"));
   uploadUsernameModalVisible.value = false;
   usernameFileList.value = [];
   return true;
 };
 const handlePasswordUploadOk = () => {
   if (passwordFileList.value.length === 0) {
-    Message.warning("请至少选择一个文件");
+    Message.warning(t("message.oneFileSelectedRequirement"));
     return false;
   }
-  Message.success("密码文件上传成功");
+  Message.success(t("message.uploadSuccess"));
   uploadPasswordModalVisible.value = false;
   passwordFileList.value = [];
   return true;

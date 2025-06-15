@@ -2,12 +2,12 @@ export default {
   common: {
     securityTools: 'Security Tools',
     config: 'Config',
-    click2Upload:'Click to upload',
-    uploadTarget:'Upload target',
-    uploadUsername:'Upload user dic',
-    uploadPassword:'Upload pass dic',
-    selectFile:'Select file',
-    selectedFile:'Selected file:',
+    click2Upload: 'Click to upload',
+    uploadTarget: 'Upload target',
+    uploadUsername: 'Upload user dic',
+    uploadPassword: 'Upload pass dic',
+    selectFile: 'Select file',
+    selectedFile: 'Selected file:',
     serviceCrack: 'Service Crack',
     portScan: 'Port Scan',
     vulnerabilityScan: 'Vulnerability Scan',
@@ -39,9 +39,9 @@ export default {
     downloadCSV: 'Download CSV',
   },
   placeholder: {
-    targetAddress: 'e.g. 192.168.1.1:22',
-    username: 'Leave empty for brute force',
-    password: 'Leave empty for dictionary'
+    targetAddress: 'e.g. 192.168.1.1:22,ftp://192.168.1.1,192.168.1.1/24:[80,8000-9000]',
+    username: 'e.g. root,test,admin',
+    password: 'e.g. pass,123,admin'
   },
   message: {
     scanCompleted: 'Scan Completed',
@@ -49,7 +49,9 @@ export default {
     scanPaused: 'Scan Paused',
     scanResumed: 'Scan Resumed',
     scanCancelled: 'Scan Cancelled',
-
     enterTargetAddress: 'Please enter the target address',
+    oneFileSelectedRequirement: 'Please select at least one file',
+    uploadSuccess: 'Upload Success',
+    targetAddressRequirement: 'Please enter the target address',
   }
 };

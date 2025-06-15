@@ -2,30 +2,44 @@ package main
 
 import (
 	"embed"
+	"maxxgui/backend"
+	"maxxgui/backend/consts"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	app := NewApp()
+	app := backend.NewApp()
 	err := wails.Run(&options.App{
 		Title:       "maxx-gui",
-		Height:      1080,
 		Width:       1920,
+		Height:      1080,
 		MinWidth:    1285,
 		MinHeight:   850,
 		StartHidden: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: app.startup,
-		Bind: []interface{}{
-			app,
+		Bind:      app.Bind(),
+		EnumBind:  app.Enums(),
+		OnStartup: app.OnStartup,
+		Windows: &windows.Options{
+			DisableFramelessWindowDecorations: true,
+			BackdropType:                      windows.None,
+		},
+		Mac: &mac.Options{
+			TitleBar: mac.TitleBarHiddenInset(),
+			About: &mac.AboutInfo{
+				Title:   consts.APP_NAME,
+				Message: app.Copyright(),
+			},
 		},
 	})
 
