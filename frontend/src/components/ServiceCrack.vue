@@ -257,7 +257,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, isRuntimeOnly } from "vue";
 import { Message } from "@arco-design/web-vue";
 import { useI18n } from "vue-i18n";
 import { addUniqueItem, genHash } from "@/utils/utils";
@@ -334,7 +334,13 @@ EventsOn(consts.EVENT.EVENT_RESULT, (data: any) => {
   ]);
 });
 
-// EventsOn(consts.EVENT.EVENT_PROGRESS, (progress: any) => {});
+EventsOn(consts.EVENT.EVENT_PROGRESS, (data: any) => {
+  const currProgress = data as number;
+  progress.value = currProgress;
+  if (currProgress >= 1) {
+    isScanning.value = false;
+  }
+});
 
 const columns = computed(() => [
   { title: t("common.target"), dataIndex: "target", width: "40%" },

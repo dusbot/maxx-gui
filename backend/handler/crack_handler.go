@@ -29,6 +29,7 @@ func (c *CrackHandler) Scan(task model.CrackTask) (ok bool) {
 	if task.Targets == "" {
 		return
 	}
+	ok = true
 	uuid, err := utils.GenerateTimestampUUID(8)
 	if err != nil {
 		slog.Printf(slog.WARN, "Failed to GenerateTimestampUUID with err[%+v]", err)
@@ -75,6 +76,7 @@ func handleProgress(ctx context.Context, id string, q *query.Query, pipe chan in
 	for progress := range pipe {
 		runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, progress)
 	}
+	runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, 1)
 }
 
 func handleResult(ctx context.Context, id string, q *query.Query, pipe chan types.Result) {
