@@ -73,10 +73,11 @@ func (c *CrackHandler) Scan(task model.CrackTask) (ok bool) {
 }
 
 func handleProgress(ctx context.Context, id string, q *query.Query, pipe chan int) {
+	defer runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, 1)
 	for progress := range pipe {
 		runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, progress)
 	}
-	runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, 1)
+	slog.Printf(slog.WARN, "progress pipe closed")
 }
 
 func handleResult(ctx context.Context, id string, q *query.Query, pipe chan types.Result) {
