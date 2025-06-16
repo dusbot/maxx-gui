@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]  # amd64/x64
+        os: [windows-latest]
 
     steps:
       - name: Checkout
@@ -45,11 +45,10 @@ jobs:
           $ARCH = $env:PROCESSOR_ARCHITECTURE.ToLower()
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
           cd ${{ env.APP_WORKING_DIRECTORY }}
-          wails build -ldflags="-X 'app/backend/common.Version=${{ github.ref_name }}'" -o ${{ env.APP_NAME }}.exe
-          cd ..
-          copy README.md app\build\bin\
-          copy LICENSE app\build\bin\
-          & "C:\Program Files\7-Zip\7z.exe" a -t7z "${{ env.APP_NAME }}-${{ github.ref_name }}.windows.$ARCH.7z" ".\app\build\bin\*" -r
+          wails build -trimpath -ldflags "-s -w" -o ${{ env.APP_NAME }}.exe
+          copy README.md .\build\bin\
+          copy LICENSE .\build\bin\
+          & "C:\Program Files\7-Zip\7z.exe" a -t7z "${{ env.APP_NAME }}-${{ github.ref_name }}.windows.$ARCH.7z" ".\build\bin\*" -r
           
       - name: Upload
         uses: softprops/action-gh-release@v1
@@ -88,7 +87,7 @@ jobs:
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
           brew install mitchellh/gon/gon
           cd ${{ env.APP_WORKING_DIRECTORY }}
-          wails build -ldflags "-X 'app/backend/common.Version=${{ github.ref_name }}'" -platform darwin/universal -o ${{ env.APP_NAME }} 
+          wails build -trimpath -ldflags "-s -w" -platform darwin/universal -o ${{ env.APP_NAME }} 
           chmod +x build/bin/*/Contents/MacOS/*
           ditto -c -k --keepParent ./build/bin/${{ env.APP_NAME }}.app ./build/bin/${{ env.APP_NAME }}-${{ github.ref_name }}.macos.universal.app.zip
 
@@ -129,8 +128,7 @@ jobs:
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
           sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
           cd ${{ env.APP_WORKING_DIRECTORY }}
-          wails build -ldflags="-X 'app/backend/common.Version=${{ github.ref_name }}'" -o ${{ env.APP_NAME }}
-          cd ..
+          wails build -trimpath -ldflags="-s -w" -o ${{ env.APP_NAME }}
           mkdir _temp_dist
           cp README.md _temp_dist/
           cp LICENSE _temp_dist/
