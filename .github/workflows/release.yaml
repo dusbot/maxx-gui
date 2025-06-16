@@ -47,7 +47,7 @@ jobs:
           cd ${{ env.APP_WORKING_DIRECTORY }}
           wails build -ldflags="-X 'app/backend/common.Version=${{ github.ref_name }}'" -o ${{ env.APP_NAME }}.exe
           cd ..
-          copy readme.md app\build\bin\
+          copy README.md app\build\bin\
           copy LICENSE app\build\bin\
           & "C:\Program Files\7-Zip\7z.exe" a -t7z "${{ env.APP_NAME }}-${{ github.ref_name }}.windows.$ARCH.7z" ".\app\build\bin\*" -r
           
