@@ -7,9 +7,9 @@
 ## Maxx-gui
 Maxx-gui 是一个基于 Maxx 引擎的图形化用户界面，用于简化 Maxx 工具的使用。
 
-## MaXx
+## [Maxx](https://github.com/dusbot/maxx)
 
-MaXx 是一个模块化的网络安全扫描器，集成了以下功能：
+[Maxx](https://github.com/dusbot/maxx) 是一个模块化的网络安全扫描器，集成了以下功能：
 
 -   端口扫描与服务指纹识别（即将推出）
 -   漏洞评估（漏洞挖掘与验证）（即将推出）

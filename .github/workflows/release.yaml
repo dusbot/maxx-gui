@@ -1,0 +1,149 @@
+name: Wails build
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+  APP_NAME: 'maxx-gui'
+  APP_WORKING_DIRECTORY: 'app'
+  GO_VERSION: '1.24.2'
+  NODE_VERSION: "22.x"
+
+jobs:
+  build-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]  # amd64/x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install 7-Zip
+        run: choco install 7zip
+
+      - name: GoLang
+        uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build & Compress
+        shell: pwsh
+        run: |
+          $ARCH = $env:PROCESSOR_ARCHITECTURE.ToLower()
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          cd ${{ env.APP_WORKING_DIRECTORY }}
+          wails build -ldflags="-X 'app/backend/common.Version=${{ github.ref_name }}'" -o ${{ env.APP_NAME }}.exe
+          cd ..
+          copy readme.md app\build\bin\
+          copy LICENSE app\build\bin\
+          & "C:\Program Files\7-Zip\7z.exe" a -t7z "${{ env.APP_NAME }}-${{ github.ref_name }}.windows.$ARCH.7z" ".\app\build\bin\*" -r
+          
+      - name: Upload
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.7z"
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: GoLang
+        uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build & Compress
+        run: |
+          ARCH=$(uname -m)
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          brew install mitchellh/gon/gon
+          cd ${{ env.APP_WORKING_DIRECTORY }}
+          wails build -ldflags "-X 'app/backend/common.Version=${{ github.ref_name }}'" -platform darwin/universal -o ${{ env.APP_NAME }} 
+          chmod +x build/bin/*/Contents/MacOS/*
+          ditto -c -k --keepParent ./build/bin/${{ env.APP_NAME }}.app ./build/bin/${{ env.APP_NAME }}-${{ github.ref_name }}.macos.universal.app.zip
+
+      - name: Upload
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.APP_WORKING_DIRECTORY }}/build/bin/*.zip
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: GoLang
+        uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build & Compress
+        run: |
+          ARCH=$(uname -m)
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+          sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+          cd ${{ env.APP_WORKING_DIRECTORY }}
+          wails build -ldflags="-X 'app/backend/common.Version=${{ github.ref_name }}'" -o ${{ env.APP_NAME }}
+          cd ..
+          mkdir _temp_dist
+          cp readme.md _temp_dist/
+          cp LICENSE _temp_dist/
+          cp -r ${{ env.APP_WORKING_DIRECTORY }}/build/bin/* _temp_dist/
+          chmod +x _temp_dist/*
+          cd _temp_dist/
+          tar -zcvf ${{ env.APP_NAME }}-${{ github.ref_name }}.ubuntu.$ARCH.tar.gz *
+          mv ${{ env.APP_NAME }}-${{ github.ref_name }}.ubuntu.$ARCH.tar.gz ..
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.tar.gz"
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
