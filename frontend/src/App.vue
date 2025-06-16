@@ -74,12 +74,16 @@
             </a-breadcrumb>
           </div>
           <div class="header-right">
-            <a-button type="text" @click="toggleLocale" :style="{ marginRight: '10px' }">
+            <a-button class="header-btn" type="text" @click="toggleLocale">
               {{ currentLocale === 'zh' ? '中文' : 'EN' }}
             </a-button>
-            <a-avatar :size="32" :style="{ backgroundColor: '#3370ff' }">
-              <icon-user />
-            </a-avatar>
+            <a-tooltip :content="$t('common.refresh')">
+              <a-button class="header-btn" type="text" @click="reloadApp" :style="{ marginRight: '10px' }">
+                <template #icon>
+                  <icon-refresh />
+                </template>
+              </a-button>
+            </a-tooltip>
           </div>
         </a-layout-header>
 
@@ -107,15 +111,21 @@ import {
   IconRight,
   IconMoonFill,
   IconSunFill,
-  IconUser
+  IconUser,
+  IconRefresh,
 } from '@arco-design/web-vue/es/icon';
 import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
 import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
 import Config from './components/Config.vue';
+import { WindowReload } from '../wailsjs/runtime/runtime';
 
 const { t, locale } = useI18n();
 
 const currentLocale = ref(locale.value);
+
+const reloadApp = () => {
+  WindowReload()
+};
 
 const arcoLocale = computed(() => {
   return currentLocale.value === 'zh' ? zhCN : enUS;
@@ -254,6 +264,26 @@ function toggleTheme() {
   padding: 0 24px;
   background-color: var(--color-bg-2);
   border-bottom: 1px solid var(--color-border);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  margin-right: 8px;
+  padding: 0 8px;
+}
+
+.header-btn .arco-icon {
+  font-size: 16px;
+  vertical-align: middle;
 }
 
 .content {

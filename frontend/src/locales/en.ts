@@ -1,5 +1,6 @@
 export default {
   common: {
+    refresh: 'Refresh',
     securityTools: 'Security Tools',
     config: 'Config',
     click2Upload: 'Click to upload',
@@ -16,6 +17,7 @@ export default {
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
     scanConfiguration: '',
+    scanConfigurationCollapse: 'Scan Configuration',
     targetAddress: 'Target',
     serviceType: 'Service Type',
     target: 'Target',
@@ -36,6 +38,7 @@ export default {
     results: '',
     executionLog: 'Execution Log',
     generateReport: 'Generate Report',
+    downloadReport: 'Download Report',
     downloadCSV: 'Download CSV',
   },
   placeholder: {
@@ -49,9 +52,15 @@ export default {
     scanPaused: 'Scan Paused',
     scanResumed: 'Scan Resumed',
     scanCancelled: 'Scan Cancelled',
+    cancelFailed: 'Cancel Failed: No such task running',
     enterTargetAddress: 'Please enter the target address',
     oneFileSelectedRequirement: 'Please select at least one file',
     uploadSuccess: 'Upload Success',
     targetAddressRequirement: 'Please enter the target address',
+    invalidTargetFormat: 'Invalid target format',
+    notSupportedYet: "Not supported yet",
+    reportGenerated: 'Report generated',
+    reportGenerationFailed: 'Report generation failed',
+    noDataToExport: "No data to export"
   }
 };

@@ -2,14 +2,18 @@ package handler
 
 import (
 	"context"
+	"math"
 	"maxxgui/backend/consts"
 	"maxxgui/backend/model"
 	"maxxgui/backend/query"
 	"maxxgui/backend/utils"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/dusbot/maxx/core/types"
 	"github.com/dusbot/maxx/libs/slog"
+	utils_ "github.com/dusbot/maxx/libs/utils"
 	"github.com/dusbot/maxx/run"
 	"github.com/google/wire"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -40,28 +44,29 @@ func (c *CrackHandler) Scan(task model.CrackTask) (ok bool) {
 		ctx    context.Context
 		cancel context.CancelFunc
 	)
-	if task.MaxRuntime != 0 {
-		ctx, cancel = context.WithCancel(context.Background())
-		CancelMap.Store(uuid, cancel)
-		defer cancel()
+	if task.MaxRuntime > 0 {
+		if task.MaxRuntime < 30 {
+			task.MaxRuntime = 30
+		}
+		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(task.MaxRuntime)*time.Second)
 	} else {
-		ctx = context.Background()
+		ctx, cancel = context.WithCancel(context.Background())
 	}
-
+	CancelMap.Store(uuid, cancel)
+	targets := utils_.ParseNetworkInput(task.Targets)
 	innerTask := &types.Task{
 		MaxTime:      task.MaxRuntime,
 		Interval:     task.Interval,
 		Progress:     true,
 		Thread:       task.Thread,
-		Targets:      []string{task.Targets},
-		Users:        []string{task.Usernames},
-		Passwords:    []string{task.Passwords},
-		ResultChan:   make(chan types.Result),
-		ProgressChan: make(chan int),
+		Targets:      targets,
+		Users:        strings.Split(task.Usernames, ","),
+		Passwords:    strings.Split(task.Passwords, ","),
+		ResultChan:   make(chan types.Result, 1<<8),
+		ProgressChan: make(chan types.Progress, 1<<8),
 	}
 
-	innerTask.ProgressChan = make(chan int, 1<<8)
-	innerTask.ResultChan = make(chan types.Result, 1<<8)
+	saveTask2DB(c.Query, &task)
 
 	go handleProgress(c.Ctx, uuid, c.Query, innerTask.ProgressChan)
 
@@ -72,16 +77,66 @@ func (c *CrackHandler) Scan(task model.CrackTask) (ok bool) {
 	return
 }
 
-func handleProgress(ctx context.Context, id string, q *query.Query, pipe chan int) {
+func (c *CrackHandler) Cancel(id string) (ok bool) {
+	var cancel any
+	cancel, ok = CancelMap.Load(id)
+	if ok {
+		defer CancelMap.Delete(id)
+		cancel.(context.CancelFunc)()
+		slog.Printf(slog.DEBUG, "CrackTask[%s] cancelled", id)
+	} else {
+		slog.Printf(slog.WARN, "CrackTask[%s] not found", id)
+	}
+	return
+}
+
+func (c *CrackHandler) CancelAll() (ok bool) {
+	defer CancelMap.Clear()
+	CancelMap.Range(func(key, value any) bool {
+		value.(context.CancelFunc)()
+		ok = true
+		return ok
+	})
+	if ok {
+		slog.Printf(slog.DEBUG, "All CrackTask cancelled")
+	} else {
+		slog.Printf(slog.WARN, "No CrackTask found")
+	}
+	return
+}
+
+func saveTask2DB(q *query.Query, task *model.CrackTask) {
+	q.CrackTask.Save(task)
+}
+
+func handleProgress(ctx context.Context, id string, q *query.Query, pipe chan types.Progress) {
+	start := time.Now()
+	var theLastProgress types.Progress
 	defer runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, 1)
 	for progress := range pipe {
-		runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, progress)
+		theLastProgress = progress
+		currProgressRate := math.Round(progress.Progress*100) / 100
+		if progress.Progress >= 1 {
+			currProgressRate = 0.99
+		}
+		runtime.EventsEmit(ctx, consts.EVENT_PROGRESS, currProgressRate)
 	}
-	slog.Printf(slog.WARN, "progress pipe closed")
+	q.CrackTask.
+		Where(q.CrackTask.ID.Eq(id)).
+		Updates(map[string]interface{}{
+			"start_time": start.Unix(),
+			"end_time":   time.Now().Unix(),
+			"progress":   theLastProgress.Progress,
+			"index":      int(theLastProgress.Done),
+			"total":      int(theLastProgress.Total),
+			"last_cost":  int(time.Since(start).Seconds()),
+		})
+	slog.Printf(slog.DEBUG, "progress pipe closed")
 }
 
 func handleResult(ctx context.Context, id string, q *query.Query, pipe chan types.Result) {
 	for result := range pipe {
+		slog.Printf(slog.DEBUG, "result: %+v", result)
 		result_ := &model.CrackResult{
 			ID:       id,
 			Target:   result.Target,
@@ -89,10 +144,8 @@ func handleResult(ctx context.Context, id string, q *query.Query, pipe chan type
 			Username: result.User,
 			Password: result.Pass,
 		}
-		runtime.EventsEmit(ctx, consts.EVENT_RESULT, result_)
-		q.Transaction(func(tx *query.Query) error {
-			tx.CrackResult.Save()
-			return nil
-		})
+		go runtime.EventsEmit(ctx, consts.EVENT_RESULT, result_)
+		q.CrackResult.Save(result_)
 	}
+	slog.Printf(slog.DEBUG, "result pipe closed")
 }

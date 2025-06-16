@@ -1,13 +1,14 @@
 export default {
   common: {
+    refresh: '刷新',
     securityTools: '安全工具',
     config: '设置',
-    click2Upload:'点击上传',
-    uploadTarget:'上传扫描目标',
-    uploadUsername:'上传用户字典',
-    uploadPassword:'上传密码字典',
-    selectFile:'选择文件',
-    selectedFile:'已选择文件：',
+    click2Upload: '点击上传',
+    uploadTarget: '上传扫描目标',
+    uploadUsername: '上传用户字典',
+    uploadPassword: '上传密码字典',
+    selectFile: '选择文件',
+    selectedFile: '已选择文件：',
     serviceCrack: '服务爆破',
     portScan: '端口扫描',
     vulnerabilityScan: '漏洞扫描',
@@ -16,6 +17,7 @@ export default {
     lightMode: '浅色模式',
     darkMode: '深色模式',
     scanConfiguration: '',
+    scanConfigurationCollapse: '扫描配置',
     targetAddress: '目标地址',
     serviceType: '服务类型',
     target: '扫描目标',
@@ -36,6 +38,7 @@ export default {
     results: '',
     executionLog: '执行日志',
     generateReport: '生成报告',
+    downloadReport: '下载报告',
     downloadCSV: '下载CSV'
   },
   placeholder: {
@@ -49,11 +52,17 @@ export default {
     scanPaused: '扫描已暂停',
     scanResumed: '扫描已继续',
     scanCancelled: '扫描已取消',
+    cancelFailed: '取消失败：查无此任务',
 
     enterTargetAddress: '请输入目标地址',
 
     oneFileSelectedRequirement: '请至少选择一个文件',
     uploadSuccess: '上传成功',
     targetAddressRequirement: '请输入目标地址',
+    invalidTargetFormat: '目标地址格式错误',
+    notSupportedYet: "暂未支持",
+    reportGenerated: '报告已生成',
+    reportGenerationFailed: '报告生成失败',
+    noDataToExport: "没有数据可导出",
   }
 };

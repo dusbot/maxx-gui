@@ -1,19 +1,24 @@
-# README
+<p align="center"> <img src="static/images/maxx_logo.svg" width="100px" alt="maxxgui"> </p>
 
-## About
+[![Latest release](https://img.shields.io/github/v/release/dusbot/maxx-gui)](https://github.com/dusbot/maxx-gui/releases/latest)![GitHub Release Date](https://img.shields.io/github/release-date/dusbot/maxx-gui)![GitHub All Releases](https://img.shields.io/github/downloads/dusbot/maxx-gui/total)[![GitHub issues](https://img.shields.io/github/issues/dusbot/maxx-gui)](https://github.com/dusbot/maxx-gui/issues)
 
-This is the official Wails Vue-TS template.
+> This tool is intended for use by authorized security testers only. Unauthorized testing is prohibited and will be at your own risk.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+## Maxx-gui
+Maxx-gui is the graphical user interface built on the Maxx engine, designed to streamline usage of Maxx tools through intuitive visual controls.
 
-## Live Development
+## MaXx
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+MaXx is a modular network security scanner combining:
 
-## Building
+- Port scanning with service fingerprinting (Coming soon)
+- Vulnerability assessment (CVE detection) (Coming soon)
+- Credential auditing (Brute-force & dictionary attacks) (Implemented in the initial release)
+- Automated exploit chaining (Beta:Coming soon)
 
-To build a redistributable, production mode package, use `wails build`.
+> If you like this tool, please star it~
+
+
+### Snapshot
+
+![](static/images/maxx_gui_en.png)

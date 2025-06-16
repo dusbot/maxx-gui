@@ -18,17 +18,20 @@ import (
 var (
 	Q           = new(Query)
 	CrackResult *crackResult
+	CrackTask   *crackTask
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	CrackResult = &Q.CrackResult
+	CrackTask = &Q.CrackTask
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:          db,
 		CrackResult: newCrackResult(db, opts...),
+		CrackTask:   newCrackTask(db, opts...),
 	}
 }
 
@@ -36,6 +39,7 @@ type Query struct {
 	db *gorm.DB
 
 	CrackResult crackResult
+	CrackTask   crackTask
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -44,6 +48,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:          db,
 		CrackResult: q.CrackResult.clone(db),
+		CrackTask:   q.CrackTask.clone(db),
 	}
 }
 
@@ -59,16 +64,19 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:          db,
 		CrackResult: q.CrackResult.replaceDB(db),
+		CrackTask:   q.CrackTask.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
 	CrackResult ICrackResultDo
+	CrackTask   ICrackTaskDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		CrackResult: q.CrackResult.WithContext(ctx),
+		CrackTask:   q.CrackTask.WithContext(ctx),
 	}
 }
 

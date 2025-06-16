@@ -26,10 +26,11 @@ func (d *DB) connect(dsn string) (err error) {
 }
 
 func (d *DB) autoMigrate() (err error) {
-	entities := []any{
+	models := []any{
 		model.CrackResult{},
+		model.CrackTask{},
 	}
-	return d.db.AutoMigrate(entities...)
+	return d.db.AutoMigrate(models...)
 }
 
 func InitQuery() *query.Query {

@@ -33,6 +33,8 @@ export namespace model {
 	    Status: number;
 	    StartTime: number;
 	    EndTime: number;
+	    Index: number;
+	    Total: number;
 	    Progress: number;
 	    LastCost: number;
 	    ID: string;
@@ -53,6 +55,8 @@ export namespace model {
 	        this.Status = source["Status"];
 	        this.StartTime = source["StartTime"];
 	        this.EndTime = source["EndTime"];
+	        this.Index = source["Index"];
+	        this.Total = source["Total"];
 	        this.Progress = source["Progress"];
 	        this.LastCost = source["LastCost"];
 	        this.ID = source["ID"];

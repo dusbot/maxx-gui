@@ -2,11 +2,12 @@ package model
 
 type CrackMetadata struct {
 	Status    byte
-	StartTime int
-	EndTime   int
+	StartTime int64
+	EndTime   int64
 
-	Progress int
-	LastCost int
+	Index, Total int
+	Progress     float64
+	LastCost     int
 }
 
 type CrackTask struct {

@@ -3,9 +3,10 @@ module maxxgui
 go 1.24.2
 
 require (
-	github.com/dusbot/maxx v0.0.4
+	github.com/dusbot/maxx v0.0.5-0.20250616062948-38ee284fd4d7
 	github.com/glebarez/sqlite v1.11.0
 	github.com/google/wire v0.6.0
+	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
 	github.com/wailsapp/wails/v2 v2.10.1
 	gorm.io/gen v0.3.26
 	gorm.io/gorm v1.25.12
@@ -22,7 +23,7 @@ require (
 	github.com/bodgit/ntlmssp v0.0.0-20240506230425-31973bb52d9b // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20250403215159-8d39553ac7cf // indirect
-	github.com/chromedp/cdproto v0.0.0-20250611220608-a17eb1ae8ff0 // indirect
+	github.com/chromedp/cdproto v0.0.0-20250615221225-2454e98bdb89 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.3 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -31,6 +32,7 @@ require (
 	github.com/emersion/go-message v0.18.2 // indirect
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
 	github.com/fatih/color v1.18.0 // indirect
+	github.com/gen2brain/shm v0.1.0 // indirect
 	github.com/geoffgarside/ber v1.2.0 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
@@ -69,6 +71,7 @@ require (
 	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
+	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jlaffaye/ftp v0.2.0 // indirect
@@ -87,6 +90,7 @@ require (
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lunixbochs/struc v0.0.0-20241101090106-8d528fa2c543 // indirect
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
 	github.com/masterzen/simplexml v0.0.0-20190410153822-31eea3082786 // indirect
 	github.com/masterzen/winrm v0.0.0-20240702205601-3fad6e106085 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -148,4 +152,4 @@ require (
 	resty.dev/v3 v3.0.0-beta.3 // indirect
 )
 
-// replace github.com/wailsapp/wails/v2 v2.10.1 => E:\gomod
+replace github.com/emersion/go-imap/v2 => github.com/emersion/go-imap/v2 v2.0.0-beta.2
