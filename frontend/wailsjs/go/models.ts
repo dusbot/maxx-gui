@@ -10,7 +10,8 @@ export namespace consts {
 export namespace model {
 	
 	export class CrackResult {
-	    ID: string;
+	    ID: number;
+	    TaskID: string;
 	    Target: string;
 	    Service: string;
 	    Username: string;
@@ -23,6 +24,7 @@ export namespace model {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.ID = source["ID"];
+	        this.TaskID = source["TaskID"];
 	        this.Target = source["Target"];
 	        this.Service = source["Service"];
 	        this.Username = source["Username"];

@@ -27,7 +27,8 @@ func newCrackResult(db *gorm.DB, opts ...gen.DOOption) crackResult {
 
 	tableName := _crackResult.crackResultDo.TableName()
 	_crackResult.ALL = field.NewAsterisk(tableName)
-	_crackResult.ID = field.NewString(tableName, "id")
+	_crackResult.ID = field.NewUint64(tableName, "id")
+	_crackResult.TaskID = field.NewString(tableName, "task_id")
 	_crackResult.Target = field.NewString(tableName, "target")
 	_crackResult.Service = field.NewString(tableName, "service")
 	_crackResult.Username = field.NewString(tableName, "username")
@@ -42,7 +43,8 @@ type crackResult struct {
 	crackResultDo
 
 	ALL      field.Asterisk
-	ID       field.String
+	ID       field.Uint64
+	TaskID   field.String
 	Target   field.String
 	Service  field.String
 	Username field.String
@@ -63,7 +65,8 @@ func (c crackResult) As(alias string) *crackResult {
 
 func (c *crackResult) updateTableName(table string) *crackResult {
 	c.ALL = field.NewAsterisk(table)
-	c.ID = field.NewString(table, "id")
+	c.ID = field.NewUint64(table, "id")
+	c.TaskID = field.NewString(table, "task_id")
 	c.Target = field.NewString(table, "target")
 	c.Service = field.NewString(table, "service")
 	c.Username = field.NewString(table, "username")
@@ -84,8 +87,9 @@ func (c *crackResult) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *crackResult) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 5)
+	c.fieldMap = make(map[string]field.Expr, 6)
 	c.fieldMap["id"] = c.ID
+	c.fieldMap["task_id"] = c.TaskID
 	c.fieldMap["target"] = c.Target
 	c.fieldMap["service"] = c.Service
 	c.fieldMap["username"] = c.Username

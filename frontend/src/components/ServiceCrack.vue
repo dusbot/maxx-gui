@@ -90,13 +90,15 @@
           {{ isScanning ? $t("common.cancel") : $t("common.scan") }}
         </a-button>
         <a-button type="outline" @click="handlePause" :disabled="!(isScanning || isPaused)"
-          :status="isScanning ? 'warning' : 'success'">
+          :status="isScanning ? 'warning' : 'normal'">
           {{ isPaused ? $t("common.continue") : $t("common.pause") }}
         </a-button>
 
         <a-button type="outline" @click="showLogDrawer = true">
-          <template #icon><icon-file /></template>
           {{ $t("common.log") }}
+        </a-button>
+        <a-button type="outline" @click="results = []">
+          {{ $t("common.clearData") }}
         </a-button>
       </div>
 
@@ -106,8 +108,7 @@
           {{ $t("common.downloadCSV") }}
         </a-button>
         <a-button type="outline" @click="handleGenerateReport" :loading="scanLoading">
-          <template #icon><icon-file-pdf /></template>
-          {{ reportGenerated ? t('common.downloadReport') : t('common.generateReport') }}
+          {{ t('common.generateReport') }}
         </a-button>
       </div>
     </div>
@@ -192,16 +193,16 @@
 </template>
 
 <script lang="ts" setup>
+import { parseIpPortRange } from "@/utils/target";
 import { addUniqueItem } from "@/utils/utils";
-import { parseIpPortRange } from "@/utils/target"
 import { Message } from "@arco-design/web-vue";
 import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { Scan, CancelAll } from "../../wailsjs/go/handler/CrackHandler";
+import { CancelAll, GenerateReport, Scan } from "../../wailsjs/go/handler/CrackHandler";
 import { consts, model } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 interface ScanParam {
   target: string;
@@ -214,6 +215,7 @@ interface ScanParam {
 }
 
 interface ResultItem {
+  id: string
   target: string;
   service: string;
   auth: string;
@@ -328,12 +330,14 @@ EventsOn(consts.EVENT.EVENT_RESULT, (data: any) => {
     extrainfo = "No Auth";
   }
   const newItem = {
+    id: result.TaskID,
     target: result.Target,
     service: result.Service,
     auth: auth,
     extrainfo: extrainfo,
   };
   addUniqueItem(results.value, newItem, [
+    "id",
     "target",
     "service",
     "auth",
@@ -375,7 +379,26 @@ const handleCollapseChange = (keys: string[]) => {
 };
 
 const handleGenerateReport = () => {
-  reportGenerated.value = false;
+  if (results.value.length === 0) {
+    Message.warning(t('message.noDataToExport'));
+    return;
+  }
+  GenerateReport(results.value[0].id, locale.value.startsWith('zh')).then((content) => {
+    if (content === "") {
+      Message.warning(t('message.reportGenerateFailed'));
+      return;
+    }
+    const blob = new Blob([content], { type: 'text/html;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${results.value[0].id}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  })
+  reportGenerated.value = true;
 };
 
 const handleDownloadCSV = () => {
@@ -408,6 +431,7 @@ const handleDownloadCSV = () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };
 
 // It will be ported to the backend in the future, 

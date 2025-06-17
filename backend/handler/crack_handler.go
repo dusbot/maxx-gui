@@ -6,7 +6,9 @@ import (
 	"maxxgui/backend/consts"
 	"maxxgui/backend/model"
 	"maxxgui/backend/query"
+	"maxxgui/backend/report"
 	"maxxgui/backend/utils"
+
 	"strings"
 	"sync"
 	"time"
@@ -105,6 +107,21 @@ func (c *CrackHandler) CancelAll() (ok bool) {
 	return
 }
 
+func (c *CrackHandler) GenerateReport(id string, zh bool) (content string) {
+	results, err := c.Query.CrackResult.Where(c.Query.CrackResult.TaskID.Eq(id)).Find()
+	if err != nil {
+		slog.Printf(slog.WARN, "Query database with error[%+v]", err)
+		return
+	}
+	task, err := c.Query.CrackTask.Where(c.Query.CrackTask.ID.Eq(id)).First()
+	if err != nil {
+		slog.Printf(slog.WARN, "Query CrackTask error[%+v]", err)
+		return
+	}
+	_, content = report.DoGenCrackReport(zh, task, results)
+	return
+}
+
 func saveTask2DB(q *query.Query, task *model.CrackTask) {
 	q.CrackTask.Save(task)
 }
@@ -138,7 +155,7 @@ func handleResult(ctx context.Context, id string, q *query.Query, pipe chan type
 	for result := range pipe {
 		slog.Printf(slog.DEBUG, "result: %+v", result)
 		result_ := &model.CrackResult{
-			ID:       id,
+			TaskID:   id,
 			Target:   result.Target,
 			Service:  result.Protocol,
 			Username: result.User,

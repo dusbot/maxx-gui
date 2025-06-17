@@ -37,6 +37,7 @@ export default {
     log: 'Log',
     results: '',
     executionLog: 'Execution Log',
+    clearData:'Clear',
     generateReport: 'Generate Report',
     downloadReport: 'Download Report',
     downloadCSV: 'Download CSV',

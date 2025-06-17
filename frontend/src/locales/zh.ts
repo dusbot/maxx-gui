@@ -37,6 +37,7 @@ export default {
     log: '日志',
     results: '',
     executionLog: '执行日志',
+    clearData: '清除',
     generateReport: '生成报告',
     downloadReport: '下载报告',
     downloadCSV: '下载CSV'

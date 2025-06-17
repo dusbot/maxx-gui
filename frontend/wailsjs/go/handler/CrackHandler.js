@@ -10,6 +10,10 @@ export function CancelAll() {
   return window['go']['handler']['CrackHandler']['CancelAll']();
 }
 
+export function GenerateReport(arg1, arg2) {
+  return window['go']['handler']['CrackHandler']['GenerateReport'](arg1, arg2);
+}
+
 export function Scan(arg1) {
   return window['go']['handler']['CrackHandler']['Scan'](arg1);
 }

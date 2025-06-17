@@ -6,4 +6,6 @@ export function Cancel(arg1:string):Promise<boolean>;
 
 export function CancelAll():Promise<boolean>;
 
+export function GenerateReport(arg1:string,arg2:boolean):Promise<string>;
+
 export function Scan(arg1:model.CrackTask):Promise<boolean>;

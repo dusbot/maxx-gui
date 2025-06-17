@@ -5,6 +5,7 @@ go 1.24.2
 require (
 	github.com/dusbot/maxx v0.0.5-0.20250616062948-38ee284fd4d7
 	github.com/glebarez/sqlite v1.11.0
+	github.com/go-echarts/go-echarts/v2 v2.6.0
 	github.com/google/wire v0.6.0
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
 	github.com/wailsapp/wails/v2 v2.10.1

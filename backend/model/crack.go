@@ -12,7 +12,7 @@ type CrackMetadata struct {
 
 type CrackTask struct {
 	CrackMetadata
-	ID                           string `gorm:"type:varchar(32);index;not null"`
+	ID                           string `gorm:"type:varchar(32);not null"`
 	Targets                      string `gorm:"not null"`
 	Usernames                    string `gorm:"null"`
 	Passwords                    string `gorm:"null"`
@@ -21,7 +21,8 @@ type CrackTask struct {
 }
 
 type CrackResult struct {
-	ID       string `gorm:"index;not null"`
+	ID       uint64 `gorm:"autoIncrement"`
+	TaskID   string `gorm:"type:varchar(32);index;not null"`
 	Target   string `gorm:"index;not null"`
 	Service  string `gorm:"index;null"`
 	Username string `gorm:"null"`
