@@ -18,7 +18,6 @@ import (
 var ()
 
 func DoGenCrackReport(zh bool, task *model.CrackTask, results []*model.CrackResult) (ok bool, content string) {
-	// 1. 定义中英文文本
 	langs := map[string]map[string]string{
 		"zh": {
 			"ReportTitle":  "安全评估报告",
@@ -301,6 +300,7 @@ func DoGenCrackReport(zh bool, task *model.CrackTask, results []*model.CrackResu
             width: 100%;
             border-collapse: collapse;
             font-size: 1.08em;
+            word-break: break-all;
         }
         .task-info-table th, .task-info-table td {
             padding: 7px 12px;
@@ -444,16 +444,22 @@ func DoGenCrackReport(zh bool, task *model.CrackTask, results []*model.CrackResu
     <div class="task-info-card">
         <div class="task-info-title">{{index .Lang "TaskInfo"}}</div>
         <table class="task-info-table">
-            <tr><th>{{index .Lang "TaskID"}}</th><td>{{.Task.ID}}</td></tr>
-            <tr><th>{{index .Lang "StartTime"}}</th><td>{{.Task.StartTime | formatTime}}</td></tr>
-            <tr><th>{{index .Lang "EndTime"}}</th><td>{{.Task.EndTime | formatTime}}</td></tr>
-            <tr><th>{{index .Lang "Targets"}}</th><td>{{.Task.Targets}}</td></tr>
-            <tr><th>{{index .Lang "Usernames"}}</th><td>{{.Task.Usernames}}</td></tr>
-            <tr><th>{{index .Lang "Passwords"}}</th><td>{{.Task.Passwords}}</td></tr>
-            <tr><th>{{index .Lang "Proxies"}}</th><td>{{.Task.Proxies}}</td></tr>
-            <tr><th>{{index .Lang "Thread"}}</th><td>{{.Task.Thread}}</td></tr>
-            <tr><th>{{index .Lang "Interval"}}</th><td>{{.Task.Interval}}</td></tr>
-            <tr><th>{{index .Lang "MaxRuntime"}}</th><td>{{.Task.MaxRuntime}}</td></tr>
+            <tr>
+                <th>{{index .Lang "Targets"}}</th>
+                <td style="word-break: break-all;">{{.Task.Targets | formatMultiline}}</td>
+            </tr>
+            <tr>
+                <th>{{index .Lang "Usernames"}}</th>
+                <td style="word-break: break-all;">{{.Task.Usernames | formatMultiline}}</td>
+            </tr>
+            <tr>
+                <th>{{index .Lang "Passwords"}}</th>
+                <td style="word-break: break-all;">{{.Task.Passwords | formatMultiline}}</td>
+            </tr>
+            <tr>
+                <th>{{index .Lang "Proxies"}}</th>
+                <td style="word-break: break-all;">{{.Task.Proxies | formatMultiline}}</td>
+            </tr>
         </table>
     </div>
     <div class="stats-cards">
@@ -528,8 +534,13 @@ func DoGenCrackReport(zh bool, task *model.CrackTask, results []*model.CrackResu
 			}
 			return time.Unix(ts, 0).Format("2006-01-02 15:04:05")
 		},
+		"formatMultiline": func(s string) template.HTML {
+			s = strings.ReplaceAll(s, ",", "<br>")
+			s = strings.ReplaceAll(s, "\n", "<br>")
+			return template.HTML(s)
+		},
 	}
-	scoreColor := "#00eaff"
+	scoreColor := "#00eaf"
 	if score < 80 {
 		scoreColor = "#ffb300"
 	}

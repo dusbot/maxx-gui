@@ -9,9 +9,8 @@
                 <a-form-item>
                   <template #label>
                     <label-component>
-                      <span style="font-weight: bold; margin-right: 10px">{{
-                        $t("common.targetAddress")
-                        }}</span>
+                      <span style="font-weight: bold; margin-right: 10px">
+                        {{ $t("common.targetAddress") }}</span>
                       <span @click="openUploadTargetDialog" style="cursor: pointer; color: #1890ff">
                         {{ t("common.click2Upload") }}
                       </span>
@@ -27,9 +26,8 @@
                 <a-form-item>
                   <template #label>
                     <label-component>
-                      <span style="font-weight: bold; margin-right: 10px">{{
-                        $t("common.username")
-                        }}</span>
+                      <span style="font-weight: bold; margin-right: 10px">
+                        {{ $t("common.username") }}</span>
                       <span @click="openUploadUsernameDialog" style="cursor: pointer; color: #1890ff">
                         {{ t("common.click2Upload") }}
                       </span>
@@ -43,9 +41,8 @@
                 <a-form-item>
                   <template #label>
                     <label-component>
-                      <span style="font-weight: bold; margin-right: 10px">{{
-                        $t("common.password")
-                        }}</span>
+                      <span style="font-weight: bold; margin-right: 10px">
+                        {{ $t("common.password") }}</span>
                       <span @click="openUploadPasswordDialog" style="cursor: pointer; color: #1890ff">
                         {{ t("common.click2Upload") }}
                       </span>
@@ -145,9 +142,8 @@
 
     <a-modal :visible="uploadTargetModalVisible" :title="t('common.uploadTarget')"
       @cancel="uploadTargetModalVisible = false" @before-ok="handleTargetUploadOk">
-      <a-upload draggable :file-list="targetFileList" :action="''" :auto-upload="false">
-        :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
+      <a-upload draggable :file-list="targetFileList" :action="''" :auto-upload="false" :multiple="false"
+        accept="text/plain" :on-before-upload="handleTargetBeforeUpload">
       </a-upload>
       <div style="margin-top: 16px">
         <p>{{ t("common.selectedFile") }}</p>
@@ -161,9 +157,8 @@
 
     <a-modal :visible="uploadUsernameModalVisible" :title="t('common.uploadUsername')"
       @cancel="uploadUsernameModalVisible = false" @before-ok="handleUsernameUploadOk">
-      <a-upload draggable :file-list="usernameFileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76">
-        :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
+      <a-upload draggable :file-list="usernameFileList" :action="''" :auto-upload="false" :multiple="false"
+        accept="text/plain" :on-before-upload="handleUsernameBeforeUpload">
       </a-upload>
       <div style="margin-top: 16px">
         <p>{{ t("common.selectedFile") }}</p>
@@ -176,9 +171,8 @@
     </a-modal>
     <a-modal :visible="uploadPasswordModalVisible" :title="t('common.uploadPassword')"
       @cancel="uploadPasswordModalVisible = false" @before-ok="handlePasswordUploadOk">
-      <a-upload draggable :file-list="passwordFileList" action="https://www.mocky.io/v2/5cc8019d300000980a055e76">
-        :multiple="true" :limit="5" accept="text/plain" >
-        <a-button type="primary">{{ t("common.selectFile") }}</a-button>
+      <a-upload draggable :file-list="passwordFileList" :action="''" :auto-upload="false" :multiple="false"
+        accept="text/plain" :on-before-upload="handlePasswordBeforeUpload">
       </a-upload>
       <div style="margin-top: 16px">
         <p>{{ t("common.selectedFile") }}</p>
@@ -369,6 +363,54 @@ const addLog = (message: string) => {
     time: new Date().toLocaleTimeString(),
     message,
   });
+};
+
+const handleTargetBeforeUpload = (file: File) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = (e.target?.result as string) || '';
+    if (content.trim()) {
+      const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line);
+      let existing = scanParam.target ? scanParam.target.split(',').map(s => s.trim()).filter(s => s) : [];
+      const merged = Array.from(new Set([...existing, ...lines]));
+      scanParam.target = merged.join(',');
+    }
+    uploadTargetModalVisible.value = false;
+  };
+  reader.readAsText(file);
+  return false;
+};
+
+const handleUsernameBeforeUpload = (file: File) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = (e.target?.result as string) || '';
+    if (content.trim()) {
+      const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line);
+      let existing = scanParam.username ? scanParam.username.split(',').map(s => s.trim()).filter(s => s) : [];
+      const merged = Array.from(new Set([...existing, ...lines]));
+      scanParam.username = merged.join(',');
+    }
+    uploadUsernameModalVisible.value = false;
+  };
+  reader.readAsText(file);
+  return false;
+};
+
+const handlePasswordBeforeUpload = (file: File) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = (e.target?.result as string) || '';
+    if (content.trim()) {
+      const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line);
+      let existing = scanParam.password ? scanParam.password.split(',').map(s => s.trim()).filter(s => s) : [];
+      const merged = Array.from(new Set([...existing, ...lines]));
+      scanParam.password = merged.join(',');
+    }
+    uploadPasswordModalVisible.value = false;
+  };
+  reader.readAsText(file);
+  return false;
 };
 
 const handleCollapseChange = (keys: string[]) => {
