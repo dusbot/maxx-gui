@@ -569,7 +569,7 @@ func DoGenCrackReport(zh bool, task *model.CrackTask, results []*model.CrackResu
 	var out bytes.Buffer
 	tpl.Execute(&out, data)
 	content = out.String()
-	slog.Printf(slog.INFO, "安全评估报告已生成")
+	slog.Printf(slog.INFO, "Report generated")
 	ok = true
 	return
 }
